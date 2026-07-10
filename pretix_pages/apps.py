@@ -13,8 +13,7 @@ class PluginApp(AppConfig):
         author = "Raphael Michel"
         category = "FEATURE"
         description = _(
-            "Allows you to add static pages to your event site, for example for a FAQ, "
-            "terms of service, etc."
+            "Allows you to add static pages to your event site, for example for a FAQ, terms of service, etc."
         )
         featured = True
         visible = True

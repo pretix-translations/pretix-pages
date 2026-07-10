@@ -14,9 +14,7 @@ class Page(LoggedModel):
         validators=[
             RegexValidator(
                 regex="^[a-zA-Z0-9.-]+$",
-                message=_(
-                    "The slug may only contain letters, numbers, dots and dashes."
-                ),
+                message=_("The slug may only contain letters, numbers, dots and dashes."),
             ),
         ],
         help_text=_(
@@ -27,17 +25,12 @@ class Page(LoggedModel):
     position = models.IntegerField(default=0)
     title = I18nCharField(verbose_name=_("Page title"))
     text = I18nTextField(verbose_name=_("Page content"))
-    link_on_frontpage = models.BooleanField(
-        default=False, verbose_name=_("Show link on the event start page")
-    )
-    link_in_footer = models.BooleanField(
-        default=False, verbose_name=_("Show link in the event footer")
-    )
+    link_on_frontpage = models.BooleanField(default=False, verbose_name=_("Show link on the event start page"))
+    link_in_footer = models.BooleanField(default=False, verbose_name=_("Show link in the event footer"))
     require_confirmation = models.BooleanField(
         default=False,
         verbose_name=_(
-            "Require the user to acknowledge this page before an "
-            "order is created (e.g. for terms of service)."
+            "Require the user to acknowledge this page before an order is created (e.g. for terms of service)."
         ),
     )
 

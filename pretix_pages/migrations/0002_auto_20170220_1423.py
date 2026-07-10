@@ -25,16 +25,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="page",
             name="link_in_footer",
-            field=models.BooleanField(
-                default=False, verbose_name="Show link in the event footer"
-            ),
+            field=models.BooleanField(default=False, verbose_name="Show link in the event footer"),
         ),
         migrations.AlterField(
             model_name="page",
             name="link_on_frontpage",
-            field=models.BooleanField(
-                default=False, verbose_name="Show link on the event start page"
-            ),
+            field=models.BooleanField(default=False, verbose_name="Show link on the event start page"),
         ),
         migrations.AlterField(
             model_name="page",

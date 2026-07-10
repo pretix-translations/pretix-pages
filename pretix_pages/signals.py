@@ -7,7 +7,9 @@ from pretix.base.signals import event_copy_data, logentry_display
 from pretix.control.signals import html_head, nav_event
 from pretix.multidomain.urlreverse import eventreverse
 from pretix.presale.signals import (
-    checkout_confirm_messages, footer_link, front_page_bottom,
+    checkout_confirm_messages,
+    footer_link,
+    front_page_bottom,
     html_head as html_head_presale,
 )
 
@@ -21,20 +23,18 @@ def control_nav_pages(sender, request=None, **kwargs):
     ):
         return []
     url = resolve(request.path_info)
-    return [
-        {
-            "label": _("Pages"),
-            "url": reverse(
-                "plugins:pretix_pages:index",
-                kwargs={
-                    "event": request.event.slug,
-                    "organizer": request.event.organizer.slug,
-                },
-            ),
-            "active": (url.namespace == "plugins:pretix_pages"),
-            "icon": "file-text",
-        }
-    ]
+    return [{
+        "label": _("Pages"),
+        "url": reverse(
+            "plugins:pretix_pages:index",
+            kwargs={
+                "event": request.event.slug,
+                "organizer": request.event.organizer.slug,
+            },
+        ),
+        "active": url.namespace == "plugins:pretix_pages",
+        "icon": "file-text",
+    }]
 
 
 @receiver(signal=event_copy_data, dispatch_uid="pages_copy_data")
@@ -65,9 +65,7 @@ def footer_link_pages(sender, request=None, **kwargs):
         cached = [
             {
                 "label": p.title,
-                "url": eventreverse(
-                    sender, "plugins:pretix_pages:show", kwargs={"slug": p.slug}
-                ),
+                "url": eventreverse(sender, "plugins:pretix_pages:show", kwargs={"slug": p.slug}),
             }
             for p in Page.objects.filter(event=sender, link_in_footer=True)
         ]

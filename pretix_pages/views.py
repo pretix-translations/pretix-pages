@@ -14,9 +14,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, ListView, TemplateView, UpdateView
 from pretix.base.forms import I18nModelForm
-from pretix.control.permissions import (
-    EventPermissionRequiredMixin, event_permission_required,
-)
+from pretix.control.permissions import EventPermissionRequiredMixin, event_permission_required
 from pretix.helpers.compat import CompatDeleteView
 from pretix.multidomain.urlreverse import build_absolute_uri
 from urllib.request import urlopen
@@ -65,21 +63,13 @@ def page_move(request, page, up=True):
 @event_permission_required("can_change_event_settings")
 def page_move_up(request, organizer, event, page):
     page_move(request, page, up=True)
-    return redirect(
-        "plugins:pretix_pages:index",
-        organizer=request.event.organizer.slug,
-        event=request.event.slug,
-    )
+    return redirect("plugins:pretix_pages:index", organizer=request.event.organizer.slug, event=request.event.slug)
 
 
 @event_permission_required("can_change_event_settings")
 def page_move_down(request, organizer, event, page):
     page_move(request, page, up=False)
-    return redirect(
-        "plugins:pretix_pages:index",
-        organizer=request.event.organizer.slug,
-        event=request.event.slug,
-    )
+    return redirect("plugins:pretix_pages:index", organizer=request.event.organizer.slug, event=request.event.slug)
 
 
 class PageForm(I18nModelForm):
@@ -102,10 +92,7 @@ class PageForm(I18nModelForm):
     def clean_slug(self):
         slug = self.cleaned_data["slug"]
         if Page.objects.filter(slug=slug, event=self.event).exists():
-            raise forms.ValidationError(
-                _("You already have a page on that URL."),
-                code="duplicate_slug",
-            )
+            raise forms.ValidationError(_("You already have a page on that URL."), code="duplicate_slug")
         return slug
 
     mimes = {
@@ -188,9 +175,7 @@ class PageEditorMixin:
         return kwargs
 
 
-class PageUpdate(
-    EventPermissionRequiredMixin, PageDetailMixin, PageEditorMixin, UpdateView
-):
+class PageUpdate(EventPermissionRequiredMixin, PageDetailMixin, PageEditorMixin, UpdateView):
     model = Page
     form_class = PageEditForm
     template_name = "pretix_pages/form.html"
@@ -211,11 +196,7 @@ class PageUpdate(
         ctx = super().get_context_data()
         ctx["locales"] = []
         ctx["url"] = build_absolute_uri(
-            self.request.event,
-            "plugins:pretix_pages:show",
-            kwargs={
-                "slug": self.object.slug,
-            },
+            self.request.event, "plugins:pretix_pages:show", kwargs={"slug": self.object.slug}
         )
 
         for lng in self.request.event.settings.locales:
@@ -242,9 +223,7 @@ class PageUpdate(
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(
-            self.request, _("We could not save your changes. See below for details.")
-        )
+        messages.error(self.request, _("We could not save your changes. See below for details."))
         return super().form_invalid(form)
 
 
@@ -256,9 +235,7 @@ class PageCreate(EventPermissionRequiredMixin, PageEditorMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data()
-        ctx["locales"] = [
-            (locale, "") for locale in self.request.event.settings.locales
-        ]
+        ctx["locales"] = [(locale, "") for locale in self.request.event.settings.locales]
         return ctx
 
     def get_success_url(self) -> str:
@@ -274,9 +251,7 @@ class PageCreate(EventPermissionRequiredMixin, PageEditorMixin, CreateView):
     def form_valid(self, form):
         form.instance.event = self.request.event
         form.instance.event = self.request.event
-        form.instance.position = (
-            self.request.event.page_set.aggregate(p=Max("position"))["p"] or 0
-        ) + 1
+        form.instance.position = (self.request.event.page_set.aggregate(p=Max("position"))["p"] or 0) + 1
         messages.success(self.request, _("The new page has been created."))
         ret = super().form_valid(form)
         form.instance.log_action(
@@ -288,9 +263,7 @@ class PageCreate(EventPermissionRequiredMixin, PageEditorMixin, CreateView):
         return ret
 
     def form_invalid(self, form):
-        messages.error(
-            self.request, _("We could not save your changes. See below for details.")
-        )
+        messages.error(self.request, _("We could not save your changes. See below for details."))
         return super().form_invalid(form)
 
 
@@ -318,9 +291,11 @@ def bleach_page_content(text):
     attributes["li"] = ["class"]
     attributes["img"] = ["src"]
 
-    return mark_safe(bleach.clean(
-        str(text),
-        tags=bleach.ALLOWED_TAGS | {"img", "p", "br", "s", "sup", "sub", "u", "h3", "h4", "h5", "h6"},
-        attributes=attributes,
-        protocols=bleach.ALLOWED_PROTOCOLS | {"data"},
-    ))
+    return mark_safe(
+        bleach.clean(
+            str(text),
+            tags=bleach.ALLOWED_TAGS | {"img", "p", "br", "s", "sup", "sub", "u", "h3", "h4", "h5", "h6"},
+            attributes=attributes,
+            protocols=bleach.ALLOWED_PROTOCOLS | {"data"},
+        )
+    )
